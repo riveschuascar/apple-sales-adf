@@ -1,0 +1,24 @@
+# Azure Authentication Configuration
+subscription_id = ""
+client_id       = ""
+client_secret   = ""
+tenant_id       = ""
+
+# Location Configuration
+location = ""
+
+# Resource Group Configuration
+resource_group_name = ""
+
+# Storage Account Configuration
+storage_account_name = ""
+
+# SQL Server Configuration
+sql_server_name        = ""
+sql_admin_username     = ""
+sql_admin_password     = ""
+sql_database_name      = ""
+sql_firewall_rule_name = ""
+
+# Azure Data Factory Configuration
+data_factory_name = ""
