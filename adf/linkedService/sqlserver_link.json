@@ -1,0 +1,17 @@
+{
+	"name": "sqlserver_link",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureSqlDatabase",
+		"typeProperties": {
+			"server": "sql-ucb-applesales-delta-8848488.database.windows.net",
+			"database": "dw-apple-sales",
+			"encrypt": "mandatory",
+			"trustServerCertificate": false,
+			"authenticationType": "SQL",
+			"userName": "SQL-DBA",
+			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIkRBVEFGQUNUT1JZQEVBMUFFNTc1LTA2MEMtNEI5Ni05RDE2LThDMTZFRURFQzRFMF9jNjg4MDUyMi00ZGVkLTQzY2MtYTlkMy0wMTkzZmU2ZDc5ZmUiDQp9"
+		}
+	}
+}
