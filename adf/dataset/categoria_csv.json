@@ -1,0 +1,39 @@
+{
+	"name": "categoria_csv",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "sa_link",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "csv"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "categoria.csv",
+				"container": "datos-bruto"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "category_id",
+				"type": "String"
+			},
+			{
+				"name": "category_name",
+				"type": "String"
+			},
+			{
+				"name": "extra_note",
+				"type": "String"
+			}
+		]
+	}
+}

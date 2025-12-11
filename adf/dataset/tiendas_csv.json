@@ -1,0 +1,47 @@
+{
+	"name": "tiendas_csv",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "sa_link",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "csv"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "tiendas.csv",
+				"container": "datos-bruto"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "Store_ID",
+				"type": "String"
+			},
+			{
+				"name": "Store_Name",
+				"type": "String"
+			},
+			{
+				"name": "City",
+				"type": "String"
+			},
+			{
+				"name": "Country",
+				"type": "String"
+			},
+			{
+				"name": "opened",
+				"type": "String"
+			}
+		]
+	}
+}
