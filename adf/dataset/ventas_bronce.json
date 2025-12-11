@@ -1,0 +1,40 @@
+{
+	"name": "ventas_bronce",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "sqlserver_link",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "bronce"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "id",
+				"type": "varchar"
+			},
+			{
+				"name": "fecha",
+				"type": "varchar"
+			},
+			{
+				"name": "id_tienda",
+				"type": "varchar"
+			},
+			{
+				"name": "id_producto",
+				"type": "varchar"
+			},
+			{
+				"name": "cantidad",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "bronce",
+			"table": "ventas"
+		}
+	}
+}
