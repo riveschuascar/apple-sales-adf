@@ -1,0 +1,43 @@
+{
+	"name": "ventas_silver",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "sqlserver_link",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "silver"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "id",
+				"type": "varchar"
+			},
+			{
+				"name": "fecha",
+				"type": "date"
+			},
+			{
+				"name": "id_tienda",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "id_producto",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "cantidad",
+				"type": "int",
+				"precision": 10
+			}
+		],
+		"typeProperties": {
+			"schema": "silver",
+			"table": "ventas"
+		}
+	}
+}
