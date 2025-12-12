@@ -52,7 +52,14 @@
 				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
-				"     errorHandlingOption: 'stopOnFirstError') ~> tablabronce"
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          id = sale_id,",
+				"          fecha = sale_date,",
+				"          id_tienda = store_id,",
+				"          id_producto = product_id,",
+				"          cantidad = quantity",
+				"     )) ~> tablabronce"
 			]
 		}
 	}

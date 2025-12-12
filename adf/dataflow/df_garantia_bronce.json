@@ -50,7 +50,13 @@
 				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
-				"     errorHandlingOption: 'stopOnFirstError') ~> tablabronce"
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          id = claim_id,",
+				"          fecha = claim_date,",
+				"          id_venta = sale_id,",
+				"          estado = repair_status",
+				"     )) ~> tablabronce"
 			]
 		}
 	}
