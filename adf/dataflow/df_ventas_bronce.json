@@ -1,0 +1,59 @@
+{
+	"name": "df_ventas_bronce",
+	"properties": {
+		"folder": {
+			"name": "bronce"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ventas_csv",
+						"type": "DatasetReference"
+					},
+					"name": "csv"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ventas_bronce",
+						"type": "DatasetReference"
+					},
+					"name": "tablabronce"
+				}
+			],
+			"transformations": [],
+			"scriptLines": [
+				"source(output(",
+				"          sale_id as string,",
+				"          sale_date as string,",
+				"          store_id as string,",
+				"          product_id as string,",
+				"          quantity as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> csv",
+				"csv sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          id as string,",
+				"          fecha as string,",
+				"          id_tienda as string,",
+				"          id_producto as string,",
+				"          cantidad as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> tablabronce"
+			]
+		}
+	}
+}

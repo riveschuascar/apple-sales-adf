@@ -1,0 +1,61 @@
+{
+	"name": "df_productos_bronce",
+	"properties": {
+		"folder": {
+			"name": "bronce"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "producto_csv",
+						"type": "DatasetReference"
+					},
+					"name": "csv"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "producto_bronce",
+						"type": "DatasetReference"
+					},
+					"name": "tablabronce"
+				}
+			],
+			"transformations": [],
+			"scriptLines": [
+				"source(output(",
+				"          Product_ID as string,",
+				"          Product_Name as string,",
+				"          Category_ID as string,",
+				"          Launch_Date as string,",
+				"          Price as string,",
+				"          notes as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> csv",
+				"csv sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          id as string,",
+				"          nombre as string,",
+				"          id_categoria as string,",
+				"          fecha_lanzamiento as string,",
+				"          precio as string,",
+				"          notas as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> tablabronce"
+			]
+		}
+	}
+}
