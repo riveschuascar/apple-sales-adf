@@ -2925,7 +2925,7 @@
 							"scripts": [
 								{
 									"type": "Query",
-									"text": "DELETE FROM gold.dim_producto;\nDELETE FROM gold.dim_categoria;\nDELETE FROM gold.dim_tienda;"
+									"text": "DELETE FROM gold.hechos_garantia;\nDELETE FROM gold.hechos_ventas;\nDELETE FROM gold.dim_producto;\nDELETE FROM gold.dim_categoria;\nDELETE FROM gold.dim_tienda;"
 								}
 							],
 							"scriptBlockExecutionTimeout": "02:00:00"
@@ -2954,42 +2954,9 @@
 			"properties": {
 				"activities": [
 					{
-						"name": "eliminarAnteriores",
-						"type": "Script",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"linkedServiceName": {
-							"referenceName": "sqlserver_link",
-							"type": "LinkedServiceReference"
-						},
-						"typeProperties": {
-							"scripts": [
-								{
-									"type": "Query",
-									"text": "DELETE FROM gold.hechos_garantia;\nDELETE FROM gold.hechos_ventas;"
-								}
-							],
-							"scriptBlockExecutionTimeout": "02:00:00"
-						}
-					},
-					{
 						"name": "df_hechos_ventas",
 						"type": "ExecuteDataFlow",
-						"dependsOn": [
-							{
-								"activity": "eliminarAnteriores",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
+						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -3067,7 +3034,6 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/sqlserver_link')]",
 				"[concat(variables('factoryId'), '/dataflows/df_hechos_ventas')]",
 				"[concat(variables('factoryId'), '/dataflows/df_hechos_garantia')]"
 			]
