@@ -115,7 +115,7 @@
 					"scripts": [
 						{
 							"type": "Query",
-							"text": "DELETE FROM gold.dim_producto;\nDELETE FROM gold.dim_categoria;\nDELETE FROM gold.dim_tienda;"
+							"text": "DELETE FROM gold.hechos_garantia;\nDELETE FROM gold.hechos_ventas;\nDELETE FROM gold.dim_producto;\nDELETE FROM gold.dim_categoria;\nDELETE FROM gold.dim_tienda;"
 						}
 					],
 					"scriptBlockExecutionTimeout": "02:00:00"
