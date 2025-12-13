@@ -1,0 +1,131 @@
+{
+	"name": "df_tienda_silver",
+	"properties": {
+		"folder": {
+			"name": "silver"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "tienda_bronce",
+						"type": "DatasetReference"
+					},
+					"name": "bronce"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "tienda_silver",
+						"type": "DatasetReference"
+					},
+					"name": "silver"
+				}
+			],
+			"transformations": [
+				{
+					"name": "trim"
+				},
+				{
+					"name": "numeroId"
+				},
+				{
+					"name": "limpiarSignosNombres"
+				},
+				{
+					"name": "nulosPorDefecto"
+				},
+				{
+					"name": "inaguracionNumerica"
+				},
+				{
+					"name": "nombreRoto"
+				},
+				{
+					"name": "unirConFIlasReconstruidas"
+				},
+				{
+					"name": "dividirPorComas"
+				},
+				{
+					"name": "reconstruirFilas"
+				},
+				{
+					"name": "OporCero"
+				},
+				{
+					"name": "sortPorId"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          id as string,",
+				"          nombre as string,",
+				"          ciudad as string,",
+				"          pais as string,",
+				"          inaguracion as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> bronce",
+				"bronce derive(id = trim(id),",
+				"          nombre = trim(nombre),",
+				"          ciudad = trim(ciudad),",
+				"          pais = trim(pais),",
+				"          inaguracion = trim(inaguracion)) ~> trim",
+				"unirConFIlasReconstruidas derive(id = toInteger(regexReplace(id, '[^0-9]', ''))) ~> numeroId",
+				"numeroId derive(nombre = regexReplace(nombre, '[^A-Za-z\\\\s]', ''),",
+				"          ciudad = regexReplace(ciudad, '[^A-Za-z\\\\s]', '')\r",
+				",",
+				"          pais = regexReplace(pais, '[^A-Za-z\\\\s]', '')) ~> limpiarSignosNombres",
+				"inaguracionNumerica derive(inaguracion = iif(\r",
+				"  isNull(inaguracion),\r",
+				"  0,\r",
+				"  inaguracion\r",
+				")\r",
+				") ~> nulosPorDefecto",
+				"OporCero cast(output(",
+				"          inaguracion as integer",
+				"     ),",
+				"     errors: true) ~> inaguracionNumerica",
+				"trim split(instr(nombre, ',') < 3,",
+				"     disjoint: false) ~> nombreRoto@(normal, roto)",
+				"nombreRoto@normal, reconstruirFilas union(byName: true)~> unirConFIlasReconstruidas",
+				"nombreRoto@roto derive(partes = split(nombre, ',')) ~> dividirPorComas",
+				"dividirPorComas derive(nombre = partes[1],",
+				"          ciudad = partes[2],",
+				"          pais = partes[3],",
+				"          inaguracion = partes[4]) ~> reconstruirFilas",
+				"limpiarSignosNombres derive(inaguracion = regexReplace(inaguracion, 'O', '0')) ~> OporCero",
+				"nulosPorDefecto sort(asc(id, true)) ~> sortPorId",
+				"sortPorId sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          id as integer,",
+				"          nombre as string,",
+				"          ciudad as string,",
+				"          pais as string,",
+				"          inaguracion as integer",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          id,",
+				"          nombre,",
+				"          ciudad,",
+				"          pais,",
+				"          inaguracion",
+				"     )) ~> silver"
+			]
+		}
+	}
+}
