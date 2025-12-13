@@ -1,0 +1,104 @@
+{
+	"name": "df_ventas_silver",
+	"properties": {
+		"folder": {
+			"name": "silver"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ventas_bronce",
+						"type": "DatasetReference"
+					},
+					"name": "bronce"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ventas_silver",
+						"type": "DatasetReference"
+					},
+					"name": "silver"
+				}
+			],
+			"transformations": [
+				{
+					"name": "trim"
+				},
+				{
+					"name": "numeroIdTienda"
+				},
+				{
+					"name": "numeroIdProducto"
+				},
+				{
+					"name": "fechas"
+				},
+				{
+					"name": "cantidad"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          id as string,",
+				"          fecha as string,",
+				"          id_tienda as string,",
+				"          id_producto as string,",
+				"          cantidad as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> bronce",
+				"bronce derive(id = trim(id),",
+				"          fecha = trim(fecha),",
+				"          id_tienda = trim(id_tienda),",
+				"          id_producto = trim(id_producto),",
+				"          cantidad = trim(cantidad)) ~> trim",
+				"trim derive(id_tienda = toInteger(regexReplace(id_tienda, '[^0-9]', ''))) ~> numeroIdTienda",
+				"numeroIdTienda derive(id_producto = toInteger(regexReplace(id_producto, '[^0-9]', ''))) ~> numeroIdProducto",
+				"cantidad derive(fecha = coalesce(\r",
+				"    toDate(fecha, 'yyyy-MM-dd'),\r",
+				"    toDate(fecha, 'dd-MM-yyyy'),\r",
+				"    toDate(fecha, 'MM-dd-yyyy'),\r",
+				"    toDate(fecha, 'dd/MM/yyyy'),\r",
+				"    toDate(fecha, 'yyyy/MM/dd'),\r",
+				"    toDate(fecha, 'MMM dd yyyy'),\r",
+				"    toDate(fecha, 'yyyy.MM.dd')\r",
+				")\r",
+				") ~> fechas",
+				"numeroIdProducto cast(output(",
+				"          cantidad as integer",
+				"     ),",
+				"     errors: true) ~> cantidad",
+				"fechas sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          id as string,",
+				"          fecha as date,",
+				"          id_tienda as integer,",
+				"          id_producto as integer,",
+				"          cantidad as integer",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          id,",
+				"          fecha,",
+				"          id_tienda,",
+				"          id_producto,",
+				"          cantidad",
+				"     )) ~> silver"
+			]
+		}
+	}
+}

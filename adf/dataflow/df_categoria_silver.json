@@ -1,0 +1,100 @@
+{
+	"name": "df_categoria_silver",
+	"properties": {
+		"folder": {
+			"name": "silver"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "categoria_bronce",
+						"type": "DatasetReference"
+					},
+					"name": "bronce"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "categoria_silver",
+						"type": "DatasetReference"
+					},
+					"name": "silver"
+				}
+			],
+			"transformations": [
+				{
+					"name": "nullosVacios"
+				},
+				{
+					"name": "trim"
+				},
+				{
+					"name": "minusculas"
+				},
+				{
+					"name": "numeroId"
+				},
+				{
+					"name": "ignorarNotaExtra"
+				},
+				{
+					"name": "eliminarDuplicados"
+				},
+				{
+					"name": "arreglarNombre"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          id as string,",
+				"          nombre as string,",
+				"          nota_extra as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> bronce",
+				"trim filter(!isNull(id) &&\r",
+				"!isNull(nombre) &&\r",
+				"length(id) > 0 &&\r",
+				"length(nombre) > 0\r",
+				") ~> nullosVacios",
+				"ignorarNotaExtra derive(id = trim(id),",
+				"          nombre = trim(nombre)) ~> trim",
+				"nullosVacios derive(id = lower(id),",
+				"          nombre = lower(nombre)) ~> minusculas",
+				"minusculas derive(id = toInteger(regexReplace(id, '[^0-9]', ''))) ~> numeroId",
+				"bronce select(mapColumn(",
+				"          id,",
+				"          nombre",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> ignorarNotaExtra",
+				"arreglarNombre aggregate(groupBy(nombre),",
+				"     id = first(id)) ~> eliminarDuplicados",
+				"numeroId derive(nombre = regexReplace(replace(nombre, '-', ' '),'[^a-zA-Z0-9\\\\s]','')) ~> arreglarNombre",
+				"eliminarDuplicados sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          id as integer,",
+				"          nombre as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          id,",
+				"          nombre",
+				"     )) ~> silver"
+			]
+		}
+	}
+}

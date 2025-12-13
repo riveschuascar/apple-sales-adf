@@ -1,0 +1,105 @@
+{
+	"name": "df_garantia_silver",
+	"properties": {
+		"folder": {
+			"name": "silver"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "garantia_bronce",
+						"type": "DatasetReference"
+					},
+					"name": "bronce"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "gatantia_silver",
+						"type": "DatasetReference"
+					},
+					"name": "silver"
+				}
+			],
+			"transformations": [
+				{
+					"name": "trim"
+				},
+				{
+					"name": "minusculasEstado"
+				},
+				{
+					"name": "numeroId"
+				},
+				{
+					"name": "fechas"
+				},
+				{
+					"name": "estados"
+				},
+				{
+					"name": "sort"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          id as string,",
+				"          fecha as string,",
+				"          id_venta as string,",
+				"          estado as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> bronce",
+				"bronce derive(id = trim(id),",
+				"          fecha = trim(fecha),",
+				"          id_venta = trim(id_venta),",
+				"          estado = trim(estado)) ~> trim",
+				"numeroId derive(estado = lower(estado)) ~> minusculasEstado",
+				"trim derive(id = toInteger(regexReplace(id, '[^0-9]', ''))) ~> numeroId",
+				"minusculasEstado derive(fecha = coalesce(\r",
+				"    toDate(fecha, 'yyyy-MM-dd'),\r",
+				"    toDate(fecha, 'dd-MM-yyyy'),\r",
+				"    toDate(fecha, 'MM-dd-yyyy'),\r",
+				"    toDate(fecha, 'dd/MM/yyyy'),\r",
+				"    toDate(fecha, 'yyyy/MM/dd'),\r",
+				"    toDate(fecha, 'MMM dd yyyy'),\r",
+				"    toDate(fecha, 'yyyy.MM.dd')\r",
+				")\r",
+				") ~> fechas",
+				"fechas derive(estado = iif(\r",
+				"    regexMatch(estado, '^(pendng)$'),\r",
+				"    'pending',\r",
+				"    estado\r",
+				")) ~> estados",
+				"estados sort(asc(id, true)) ~> sort",
+				"sort sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          id as integer,",
+				"          fecha as date,",
+				"          id_venta as string,",
+				"          estado as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          id,",
+				"          fecha,",
+				"          id_venta,",
+				"          estado",
+				"     )) ~> silver"
+			]
+		}
+	}
+}

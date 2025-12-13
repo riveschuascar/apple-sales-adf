@@ -1,0 +1,37 @@
+{
+	"name": "hechos_garantia",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "sqlserver_link",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "gold"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "fecha",
+				"type": "date"
+			},
+			{
+				"name": "id_venta",
+				"type": "varchar"
+			},
+			{
+				"name": "estado",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "gold",
+			"table": "hechos_garantia"
+		}
+	}
+}

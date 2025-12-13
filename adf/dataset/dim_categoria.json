@@ -1,0 +1,29 @@
+{
+	"name": "dim_categoria",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "sqlserver_link",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "gold"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "nombre",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "gold",
+			"table": "dim_categoria"
+		}
+	}
+}

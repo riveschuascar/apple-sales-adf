@@ -1,0 +1,66 @@
+{
+	"name": "df_tienda_bronce",
+	"properties": {
+		"folder": {
+			"name": "bronce"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "tiendas_csv",
+						"type": "DatasetReference"
+					},
+					"name": "csv"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "tienda_bronce",
+						"type": "DatasetReference"
+					},
+					"name": "tablabronce"
+				}
+			],
+			"transformations": [],
+			"scriptLines": [
+				"source(output(",
+				"          Store_ID as string,",
+				"          Store_Name as string,",
+				"          City as string,",
+				"          Country as string,",
+				"          opened as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> csv",
+				"csv sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          id as string,",
+				"          nombre as string,",
+				"          ciudad as string,",
+				"          pais as string,",
+				"          inaguracion as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          id = Store_ID,",
+				"          nombre = Store_Name,",
+				"          ciudad = City,",
+				"          pais = Country,",
+				"          inaguracion = opened",
+				"     )) ~> tablabronce"
+			]
+		}
+	}
+}

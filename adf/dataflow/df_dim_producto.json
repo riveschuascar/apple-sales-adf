@@ -1,0 +1,68 @@
+{
+	"name": "df_dim_producto",
+	"properties": {
+		"folder": {
+			"name": "gold"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "producto_silver",
+						"type": "DatasetReference"
+					},
+					"name": "silver"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "dim_producto",
+						"type": "DatasetReference"
+					},
+					"name": "gold"
+				}
+			],
+			"transformations": [],
+			"scriptLines": [
+				"source(output(",
+				"          id as integer,",
+				"          nombre as string,",
+				"          id_categoria as integer,",
+				"          fecha_lanzamiento as date,",
+				"          precio as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'SELECT DISTINCT * FROM silver.producto',",
+				"     format: 'query') ~> silver",
+				"silver sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          id as integer,",
+				"          nombre as string,",
+				"          id_categoria as integer,",
+				"          fecha_lanzamiento as date,",
+				"          precio as integer",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          id,",
+				"          nombre,",
+				"          id_categoria,",
+				"          fecha_lanzamiento,",
+				"          precio",
+				"     )) ~> gold"
+			]
+		}
+	}
+}
