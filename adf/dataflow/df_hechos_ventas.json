@@ -1,0 +1,159 @@
+{
+	"name": "df_hechos_ventas",
+	"properties": {
+		"folder": {
+			"name": "gold"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ventas_silver",
+						"type": "DatasetReference"
+					},
+					"name": "silverVentas"
+				},
+				{
+					"dataset": {
+						"referenceName": "dim_categoria",
+						"type": "DatasetReference"
+					},
+					"name": "categoria"
+				},
+				{
+					"dataset": {
+						"referenceName": "dim_producto",
+						"type": "DatasetReference"
+					},
+					"name": "producto"
+				},
+				{
+					"dataset": {
+						"referenceName": "dim_tienda",
+						"type": "DatasetReference"
+					},
+					"name": "tienda"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "hechos_ventas",
+						"type": "DatasetReference"
+					},
+					"name": "hechosVentas"
+				}
+			],
+			"transformations": [
+				{
+					"name": "lkpProducto"
+				},
+				{
+					"name": "lkpCategoria"
+				},
+				{
+					"name": "lkpTienda"
+				},
+				{
+					"name": "select"
+				},
+				{
+					"name": "calcularTotal"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          id as string,",
+				"          fecha as date,",
+				"          id_tienda as integer,",
+				"          id_producto as integer,",
+				"          cantidad as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> silverVentas",
+				"source(output(",
+				"          id as integer,",
+				"          nombre as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> categoria",
+				"source(output(",
+				"          id as integer,",
+				"          nombre as string,",
+				"          id_categoria as integer,",
+				"          fecha_lanzamiento as date,",
+				"          precio as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> producto",
+				"source(output(",
+				"          id as integer,",
+				"          nombre as string,",
+				"          ciudad as string,",
+				"          pais as string,",
+				"          ano_inauguracion as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> tienda",
+				"silverVentas, producto lookup(id_producto == producto@id,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lkpProducto",
+				"lkpProducto, categoria lookup(id_categoria == categoria@id,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lkpCategoria",
+				"lkpCategoria, tienda lookup(id_tienda == tienda@id,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lkpTienda",
+				"calcularTotal select(mapColumn(",
+				"          id = silverVentas@id,",
+				"          fecha,",
+				"          cantidad,",
+				"          id_producto = producto@id,",
+				"          id_tienda = tienda@id,",
+				"          total",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select",
+				"lkpTienda derive(total = multiply(precio, cantidad)) ~> calcularTotal",
+				"select sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          id as string,",
+				"          fecha as date,",
+				"          id_tienda as integer,",
+				"          id_producto as integer,",
+				"          cantidad as integer,",
+				"          total as integer",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          id,",
+				"          fecha,",
+				"          id_tienda,",
+				"          id_producto,",
+				"          cantidad,",
+				"          total",
+				"     )) ~> hechosVentas"
+			]
+		}
+	}
+}

@@ -1,0 +1,102 @@
+{
+	"name": "df_hechos_garantia",
+	"properties": {
+		"folder": {
+			"name": "gold"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "gatantia_silver",
+						"type": "DatasetReference"
+					},
+					"name": "silver"
+				},
+				{
+					"dataset": {
+						"referenceName": "hechos_ventas",
+						"type": "DatasetReference"
+					},
+					"name": "ventas"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "hechos_garantia",
+						"type": "DatasetReference"
+					},
+					"name": "hechosGarantia"
+				}
+			],
+			"transformations": [
+				{
+					"name": "lkpVentas"
+				},
+				{
+					"name": "select"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          id as integer,",
+				"          fecha as date,",
+				"          id_venta as string,",
+				"          estado as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> silver",
+				"source(output(",
+				"          id as string,",
+				"          fecha as date,",
+				"          id_tienda as integer,",
+				"          id_producto as integer,",
+				"          cantidad as integer,",
+				"          total as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> ventas",
+				"silver, ventas lookup(id_venta == ventas@id,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lkpVentas",
+				"lkpVentas select(mapColumn(",
+				"          id = silver@id,",
+				"          fecha = silver@fecha,",
+				"          estado,",
+				"          id_venta = ventas@id",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select",
+				"select sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          id as integer,",
+				"          fecha as date,",
+				"          id_venta as string,",
+				"          estado as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          id,",
+				"          fecha,",
+				"          id_venta,",
+				"          estado",
+				"     )) ~> hechosGarantia"
+			]
+		}
+	}
+}

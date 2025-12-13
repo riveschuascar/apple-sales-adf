@@ -57,6 +57,9 @@
 				},
 				{
 					"name": "sortPorId"
+				},
+				{
+					"name": "nombresVacios"
 				}
 			],
 			"scriptLines": [
@@ -100,7 +103,8 @@
 				"          pais = partes[3],",
 				"          inaguracion = partes[4]) ~> reconstruirFilas",
 				"limpiarSignosNombres derive(inaguracion = regexReplace(inaguracion, 'O', '0')) ~> OporCero",
-				"nulosPorDefecto sort(asc(id, true)) ~> sortPorId",
+				"nombresVacios sort(asc(id, true)) ~> sortPorId",
+				"nulosPorDefecto filter(!isNull(nombre) && nombre != '') ~> nombresVacios",
 				"sortPorId sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",

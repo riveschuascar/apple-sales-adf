@@ -1,0 +1,68 @@
+{
+	"name": "df_dim_tienda",
+	"properties": {
+		"folder": {
+			"name": "gold"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "tienda_silver",
+						"type": "DatasetReference"
+					},
+					"name": "silver"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "dim_tienda",
+						"type": "DatasetReference"
+					},
+					"name": "gold"
+				}
+			],
+			"transformations": [],
+			"scriptLines": [
+				"source(output(",
+				"          id as integer,",
+				"          nombre as string,",
+				"          ciudad as string,",
+				"          pais as string,",
+				"          inaguracion as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'SELECT DISTINCT * FROM silver.tienda',",
+				"     format: 'query') ~> silver",
+				"silver sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          id as integer,",
+				"          nombre as string,",
+				"          ciudad as string,",
+				"          pais as string,",
+				"          ano_inauguracion as integer",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          id,",
+				"          nombre,",
+				"          ciudad,",
+				"          pais,",
+				"          ano_inauguracion = inaguracion",
+				"     )) ~> gold"
+			]
+		}
+	}
+}
