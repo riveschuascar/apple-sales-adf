@@ -1,0 +1,130 @@
+{
+	"name": "df_producto_silver",
+	"properties": {
+		"folder": {
+			"name": "silver"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "producto_bronce",
+						"type": "DatasetReference"
+					},
+					"name": "bronce"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "producto_silver",
+						"type": "DatasetReference"
+					},
+					"name": "silver"
+				}
+			],
+			"transformations": [
+				{
+					"name": "trim"
+				},
+				{
+					"name": "numerosIds"
+				},
+				{
+					"name": "arreglarPrecio"
+				},
+				{
+					"name": "numeroPrecio"
+				},
+				{
+					"name": "limpiarPrecio"
+				},
+				{
+					"name": "formatoFechas"
+				},
+				{
+					"name": "agregarCategoriaPorNombre"
+				},
+				{
+					"name": "filtroPrecioNull"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          id as string,",
+				"          nombre as string,",
+				"          id_categoria as string,",
+				"          fecha_lanzamiento as string,",
+				"          precio as string,",
+				"          notas as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> bronce",
+				"bronce derive(id = trim(id),",
+				"          nombre = trim(nombre),",
+				"          id_categoria = trim(id_categoria),",
+				"          fecha_lanzamiento = trim(fecha_lanzamiento),",
+				"          precio = trim(precio),",
+				"          notas = trim(notas)) ~> trim",
+				"trim derive(id = toInteger(regexReplace(id, '[^0-9]', '')),",
+				"          id_categoria = toInteger(regexReplace(id_categoria, '[^0-9]', ''))) ~> numerosIds",
+				"limpiarPrecio derive(precio = iif(\r",
+				"  !isNull(notas) &&\r",
+				"  length(trim(notas)) > 0 &&\r",
+				"  regexMatch(trim(notas), '^[0-9]'),\r",
+				"  concat(precio, notas),\r",
+				"  precio\r",
+				")\r",
+				") ~> arreglarPrecio",
+				"arreglarPrecio cast(output(",
+				"          precio as integer",
+				"     ),",
+				"     errors: true) ~> numeroPrecio",
+				"numerosIds derive(precio = regexReplace(precio, '[^0-9]', '')) ~> limpiarPrecio",
+				"filtroPrecioNull derive(fecha_lanzamiento = coalesce(\r",
+				"    toDate(fecha_lanzamiento, 'yyyy-MM-dd'),\r",
+				"    toDate(fecha_lanzamiento, 'dd-MM-yyyy'),\r",
+				"    toDate(fecha_lanzamiento, 'MM-dd-yyyy'),\r",
+				"    toDate(fecha_lanzamiento, 'dd/MM/yyyy'),\r",
+				"    toDate(fecha_lanzamiento, 'yyyy/MM/dd'),\r",
+				"    toDate(fecha_lanzamiento, 'MMM dd yyyy'),\r",
+				"    toDate(fecha_lanzamiento, 'yyyy.MM.dd')\r",
+				")\r",
+				") ~> formatoFechas",
+				"formatoFechas derive(id_categoria = iif(\r",
+				"  isNull(id_categoria) && regexMatch(lower(nombre), '.*ipod.*'),\r",
+				"  3,\r",
+				"  id_categoria\r",
+				")) ~> agregarCategoriaPorNombre",
+				"numeroPrecio filter(!isNull(precio)) ~> filtroPrecioNull",
+				"agregarCategoriaPorNombre sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          id as integer,",
+				"          nombre as string,",
+				"          id_categoria as integer,",
+				"          fecha_lanzamiento as date,",
+				"          precio as integer",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          id,",
+				"          nombre,",
+				"          id_categoria,",
+				"          fecha_lanzamiento,",
+				"          precio",
+				"     )) ~> silver"
+			]
+		}
+	}
+}
