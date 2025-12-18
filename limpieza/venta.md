@@ -1,34 +1,40 @@
-1. Trim basico
+### 1. Trim básico
 
-derivated column
+``` text
+derived column
 
 id = trim(id)
-.
-.
-.
 cantidad = trim(cantidad)
+```
 
-2. Id tienda como numero
+### 2. Id tienda a número
 
-derivated column
+``` text
+derived column
 
 id_tienda = toInteger(regexReplace(id_tienda, '[^0-9]', ''))
+```
 
-3. Id producto como numero
+### 3. Id producto a número
 
-derivated column
+``` text
+derived column
 
 id_producto = toInteger(regexReplace(id_producto, '[^0-9]', ''))
+```
 
-4. Convertir cantidad a numero
+### 4. Convertir cantidad
 
+``` text
 cast
 
 cantidad -> integer
+```
 
-5. Formatear la fecha
+### 5. Formatear fecha
 
-derivated column
+``` text
+derived column
 
 fecha = coalesce(
     toDate(fecha, 'yyyy-MM-dd'),
@@ -39,3 +45,4 @@ fecha = coalesce(
     toDate(fecha, 'MMM dd yyyy'),
     toDate(fecha, 'yyyy.MM.dd')
 )
+```

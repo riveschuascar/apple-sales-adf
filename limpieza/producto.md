@@ -1,29 +1,33 @@
-1. Trim basico
+### 1. Trim básico
 
-derivated column
+``` text
+derived column
 
 id = trim(id)
-.
-.
-.
 notas = trim(notas)
+```
 
-2. Ids a numeros
+### 2. Ids a números
 
-derivated column
+``` text
+derived column
 
 id = toInteger(regexReplace(id, '[^0-9]', ''))
 id_categoria = toInteger(regexReplace(id_categoria, '[^0-9]', ''))
+```
 
-3. Limpiar precio (solo numeros)
+### 3. Limpiar precio
 
-derivated column
+``` text
+derived column
 
 precio = regexReplace(precio, '[^0-9]', '')
+```
 
-4. Arreglar precios (algunos nuemeros en columna de notas)
+### 4. Arreglar precios desde notas
 
-derivated column
+``` text
+derived column
 
 iif(
   !isNull(notas) &&
@@ -32,22 +36,28 @@ iif(
   concat(precio, notas),
   precio
 )
+```
 
-5. Convertir precio a numero 
+### 5. Convertir precio a número
 
+``` text
 cast
 
-precio -> interger
+precio -> integer
+```
 
-6. Filtro precios nulos
+### 6. Filtro precios nulos
 
+``` text
 filter
 
 !isNull(precio)
+```
 
-7. Formatear las fechas
+### 7. Formatear fechas
 
-derivated column
+``` text
+derived column
 
 fecha = coalesce(
     toDate(fecha_lanzamiento, 'yyyy-MM-dd'),
@@ -58,13 +68,16 @@ fecha = coalesce(
     toDate(fecha_lanzamiento, 'MMM dd yyyy'),
     toDate(fecha_lanzamiento, 'yyyy.MM.dd')
 )
+```
 
-8. Arreglar algunas categorias nulas
+### 8. Arreglar categorías nulas
 
-derivated column
+``` text
+derived column
 
 id_categoria = iif(
   isNull(id_categoria) && regexMatch(lower(nombre), '.*ipod.*'),
   3,
   id_categoria
 )
+```
