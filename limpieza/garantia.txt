@@ -1,0 +1,49 @@
+1. Trim basico
+
+derivated column
+
+id = trim(id)
+...
+estadp = trim(estado)
+
+2. Id como numero
+
+derivated column
+
+id = toInteger(regexReplace(id, '[^0-9]', ''))
+
+3. Normalizar a minusculas estado
+
+derivated column
+
+estado = lower(estado)
+
+4. Dar formato a la fecha
+
+derivated column
+
+fecha = coalesce(
+    toDate(fecha, 'yyyy-MM-dd'),
+    toDate(fecha, 'dd-MM-yyyy'),
+    toDate(fecha, 'MM-dd-yyyy'),
+    toDate(fecha, 'dd/MM/yyyy'),
+    toDate(fecha, 'yyyy/MM/dd'),
+    toDate(fecha, 'MMM dd yyyy'),
+    toDate(fecha, 'yyyy.MM.dd')
+)
+
+5. Arreglar typos en estado
+
+derivated column
+
+estado = iif(
+    regexMatch(estado, '^(pendng)$'),
+    'pending',
+    estado
+)
+
+6. Ordenamos por id
+
+sort
+
+id, asc

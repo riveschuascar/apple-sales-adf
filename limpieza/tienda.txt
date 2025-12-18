@@ -1,0 +1,85 @@
+1. Trim básico
+
+derived column
+
+id = trim(id)
+nombre = trim(nombre)
+ciudad = trim(ciudad)
+pais = trim(pais)
+inaguracion = trim(inaguracion)
+
+2. Separar nombres rotos por coma
+
+split
+
+condición: instr(nombre, ',') < 3
+salidas: normal / roto
+
+3. Reconstruir filas desde nombres rotos
+
+derived column
+
+partes = split(nombre, ',')
+
+4. Asignar columnas desde partes reconstruidas
+
+derived column
+
+nombre = partes[1]
+ciudad = partes[2]
+pais = partes[3]
+inaguracion = partes[4]
+
+5. Unir filas originales con filas reconstruidas
+
+union
+
+byName = true
+
+6. Convertir id a número
+
+derived column
+
+id = toInteger(regexReplace(id, '[^0-9]', ''))
+
+7. Limpiar signos en columnas de texto
+
+derived column
+
+nombre = regexReplace(nombre, '[^A-Za-z\s]', '')
+ciudad = regexReplace(ciudad, '[^A-Za-z\s]', '')
+pais = regexReplace(pais, '[^A-Za-z\s]', '')
+
+8. Reemplazar letra O por cero en inauguración
+
+derived column
+
+inaguracion = regexReplace(inaguracion, 'O', '0')
+
+9. Convertir inauguración a número
+
+cast
+
+inaguracion -> integer
+
+10. Reemplazar valores nulos de inauguración por cero
+
+derived column
+
+inaguracion = iif(
+isNull(inaguracion),
+0,
+inaguracion
+)
+
+11. Filtrar nombres nulos o vacíos
+
+filter
+
+!isNull(nombre) && nombre != ''
+
+12. Ordenar por id
+
+sort
+
+asc(id)

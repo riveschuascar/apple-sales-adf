@@ -1,0 +1,47 @@
+Project gold_model {
+  database_type: "SQL Server"
+}
+
+Schema gold
+
+Table gold.dim_categoria {
+  id int [pk]
+  nombre varchar
+}
+
+Table gold.dim_producto {
+  id int [pk]
+  nombre varchar
+  id_categoria int
+  fecha_lanzamiento date
+  precio int
+}
+
+Table gold.dim_tienda {
+  id int [pk]
+  nombre varchar
+  ciudad varchar
+  pais varchar
+  ano_inauguracion int
+}
+
+Table gold.hechos_ventas {
+  id varchar [pk]
+  fecha date
+  id_tienda int
+  id_producto int
+  cantidad int
+  total int
+}
+
+Table gold.hechos_garantia {
+  id int
+  fecha date
+  id_venta varchar
+  estado varchar
+}
+
+Ref: gold.dim_producto.id_categoria > gold.dim_categoria.id
+Ref: gold.hechos_ventas.id_tienda > gold.dim_tienda.id
+Ref: gold.hechos_ventas.id_producto > gold.dim_producto.id
+Ref: gold.hechos_garantia.id_venta > gold.hechos_ventas.id
